@@ -5746,6 +5746,11 @@ declare namespace chrome.system.cpu {
         features: string[];
         /** Information about each logical processor. */
         processors: ProcessorInfo[];
+        /**
+         * List of CPU temperature readings from each thermal zone of the CPU. Temperatures are in degrees Celsius.
+         * Currently supported on Chrome OS only.
+         */
+        temperatures: number[];
     }
 
     /** Queries basic CPU information of the system. */
