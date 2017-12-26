@@ -1026,7 +1026,7 @@ declare namespace chrome.system.display {
         boundsOriginX?: number;
 
         /** If set, updates the display's logical bounds origin along y-axis. See documentation for boundsOriginX parameter. */
-        boundsOriginY: number;
+        boundsOriginY?: number;
 
         /**
          * @since Chrome 52
