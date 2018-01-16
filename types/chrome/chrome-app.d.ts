@@ -191,6 +191,110 @@ declare namespace chrome.app.window {
     export var onRestored: WindowEvent;
 }
 
+/**
+ * Use the chrome.bluetooth API to connect to a Bluetooth device. All functions report failures via chrome.runtime.lastError.
+ *
+ * @since Chrome 37
+ */
+declare namespace chrome.bluetooth {
+
+    export interface AdapterState {
+        /** The address of the adapter, in the format 'XX:XX:XX:XX:XX:XX'. */
+        address: string;
+        /** The human-readable name of the adapter. */
+        name: string;
+        /** Indicates whether or not the adapter has power. */
+        powered: boolean;
+        /** Indicates whether or not the adapter is available (i.e. enabled). */
+        available: boolean;
+        /** Indicates whether or not the adapter is currently discovering. */
+        discovering: boolean;
+    }
+
+    export type DeviceType = 'computer' | 'phone' | 'modem' | 'audio' | 'carAudio' | 'video' | 'peripheral' | 'joystick' | 'gamepad' | 'keyboard' | 'mouse' | 'tablet' | 'keyboardMouseCombo';
+
+    export interface Device {
+        /** The address of the device, in the format 'XX:XX:XX:XX:XX:XX'. */
+        address: string;
+        /** The human-readable name of the device. */
+        name?: string;
+        /** The class of the device, a bit-field defined by http://www.bluetooth.org/en-us/specification/assigned-numbers/baseband. */
+        deviceClass?: number;
+        /** The Device ID record of the device, where available. */
+        vendorIdSource?: 'bluetooth' | 'usb';
+        vendorId?: number;
+        productId?: number;
+        deviceId: number;
+        /** The type of the device, if recognized by Chrome. This is obtained from the |deviceClass| field and only represents a small fraction of the possible device types. When in doubt you should use the |deviceClass| field directly. */
+        type?: DeviceType;
+        /** Indicates whether or not the device is paired with the system. */
+        paired?: boolean;
+        /** Indicates whether the device is currently connected to the system. */
+        connected?: boolean;
+        /**
+         * Indicates whether the device is currently connecting to the system.
+         * @since Chrome 48
+         */
+        connecting?: boolean;
+        /**
+         * Indicates whether the device is connectable.
+         * @since Chrome 48
+         */
+        connectable?: boolean;
+        /** UUIDs of protocols, profiles and services advertised by the device. For classic Bluetooth devices, this list is obtained from EIR data and SDP tables. For Low Energy devices, this list is obtained from AD and GATT primary services. For dual mode devices this may be obtained from both. */
+        uuids: string[];
+        /**
+         * The received signal strength, in dBm. This field is avaliable and valid only during discovery. Outside of discovery it's value is not specified.
+         * @since Chrome 44
+         */
+        inquiryRssi?: number;
+        /**
+         * The transmitted power level. This field is avaliable only for LE devices that include this field in AD. It is avaliable and valid only during discovery.
+         * @since Chrome 44
+         */
+        inquiryTxPower?: number;
+    }
+
+    /** Get information about the Bluetooth adapter. */
+    export function getAdapterState(callback: (adapterState: AdapterState) => void): void;
+    /** Get information about a Bluetooth device known to the system. */
+    export function getDevice(deviceAddress: string, callback: (deviceInfo: Device) => void): void;
+    /** Get a list of Bluetooth devices known to the system, including paired and recently discovered devices. */
+    export function getDevices(callback: (deviceInfos: Device[]) => void): void;
+    /**
+     * Start discovery. Newly discovered devices will be returned via the onDeviceAdded event. Previously discovered devices already known to the adapter must be obtained using getDevices and will only be updated using the |onDeviceChanged| event if information about them changes.
+     * Discovery will fail to start if this application has already called startDiscovery. Discovery can be resource intensive: stopDiscovery should be called as soon as possible. 
+     */
+    export function startDiscovery(callback?: () => void): void;
+    /** Stop discovery. */
+    export function stopDiscovery(callback?: () => void): void;
+
+    export interface AdapterStateChangedEventArgs {
+        state: AdapterState;
+    }
+
+    export interface DeviceAddedEventArgs {
+        device: Device;
+    }
+
+    export interface DeviceChangedEventArgs {
+        device: Device;
+    }
+
+    export interface DeviceRemovedEventArgs {
+        device: Device;
+    }
+
+    /** Fired when the state of the Bluetooth adapter changes. */
+    export var onAdapterStateChanged: chrome.events.Event<(args: AdapterStateChangedEventArgs) => void>;
+    /** Fired when information about a new Bluetooth device is available. */
+    export var onDeviceAdded: chrome.events.Event<(args: DeviceAddedEventArgs) => void>;
+    /** Fired when information about a known Bluetooth device has changed. */
+    export var onDeviceChanged: chrome.events.Event<(args: DeviceChangedEventArgs) => void>;
+    /** Fired when a Bluetooth device that was previously discovered has been out of range for long enough to be considered unavailable again, and when a paired device is removed. */
+    export var onDeviceRemoved: chrome.events.Event<(args: DeviceRemovedEventArgs) => void>;
+}
+
 ////////////////////
 // fileSystem
 ////////////////////
